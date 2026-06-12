@@ -46,12 +46,13 @@ public class Main extends Application {
 	 // Image to put diagnostics on
 	Mat matSnapDiag;
 
-	//String colorsFileName;
+	//UserSelection userSelection;
 	
 	@Override
 	public void start(Stage primaryStage) {
 		
-		debugMode = true;
+		debugMode = false;//true;
+		//userSelection = new UserSelection();
 		
 		/* Setup GUI elements */
 		
@@ -63,9 +64,9 @@ public class Main extends Application {
 		this.canvas_tmp = new Canvas(700, 550);
 		this.g2d_tmp = canvas_tmp.getGraphicsContext2D();
 
-		/* Two BUttons and HBox*/
+		/* Buttons and HBox*/
 		Button setSceneButton = new Button();
-		setSceneButton.setText("Set a Scene");
+		setSceneButton.setText("Set");
 		setSceneButton.setOnAction(new EventHandler<ActionEvent>() {
 	 
 	            @Override
@@ -76,30 +77,55 @@ public class Main extends Application {
 	        });
 
 		Button takeSceneButton = new Button();
-		takeSceneButton.setText("Take a Scene");
+		takeSceneButton.setText("Snapshot");
 		takeSceneButton.setOnAction(new EventHandler<ActionEvent>() {
 	 
 	            @Override
 	            public void handle(ActionEvent event) {
-	                System.out.println("Taking a Scene");
+	                System.out.println("Snapshot");
 	                takeSnap();
 	                timer.stop();
 	            }
 	        });
 
-		Button selectMarkersButton = new Button();
-		selectMarkersButton.setText("Select Colors");
-		selectMarkersButton.setOnAction(new EventHandler<ActionEvent>() {
+
+		Button newFileButton = new Button();
+		newFileButton.setText("New marker file");
+		newFileButton.setOnAction(new EventHandler<ActionEvent>() {
 	 
 	            @Override
 	            public void handle(ActionEvent event) {
-	                System.out.println("Selecting colors mode");
-	                cvDriver.selectColors();
+	                System.out.println("New marker file");
+	                cvDriver.startNewFile();
 	                timer.stop();
 	            }
 	        });
-		 HBox hbox = new HBox(8);
-	     hbox.getChildren().addAll(setSceneButton, takeSceneButton, selectMarkersButton);
+
+		Button chooseColorButton = new Button();
+		chooseColorButton.setText("Choose Color");
+		chooseColorButton.setOnAction(new EventHandler<ActionEvent>() {
+	 
+	            @Override
+	            public void handle(ActionEvent event) {
+	                System.out.println("Choosing a color");
+	                cvDriver.chooseColor();
+	            }
+	        });
+
+		Button copyFileButton = new Button();
+		copyFileButton.setText("Copy the marker file");
+		copyFileButton.setOnAction(new EventHandler<ActionEvent>() {
+	 
+	            @Override
+	            public void handle(ActionEvent event) {
+	                System.out.println("Copying the marker file");
+	                //cvDriver.selectColors();
+	                timer.stop();
+	            }
+	        });
+
+		HBox hbox = new HBox(8);
+	     hbox.getChildren().addAll(setSceneButton, takeSceneButton, newFileButton, chooseColorButton, copyFileButton);
 	     
 	     	/* a Pane and a Scene */
 	        BorderPane root = new BorderPane();
@@ -144,17 +170,18 @@ public class Main extends Application {
 
 		camvideo.read(matSnap);
 
-		matSnapDiag = matSnap;
+		matSnapDiag = matSnap.clone();
 
-		int selection = cvDriver.findSelectedMarker(matSnap, matSnapDiag);
+		/* debug Mat tmp = cvDriver.prepareLabImage(matSnap); */
 		
-		if(debugMode)
-			System.out.printf("%nSelected marker: %d%n%n", selection);
+		cvDriver.findSelectedMarker(matSnap, matSnapDiag);
 		
+		/* debug snapShot = mat2Image(tmp); */
 		snapShot = mat2Image(matSnapDiag);
-		g2d_tmp.drawImage(snapShot, 0, 0);
-
 		
+		g2d_tmp.drawImage(snapShot, 0, 0);
+		
+		matSnapDiag.release();		
 	}
 
 	
@@ -171,7 +198,7 @@ public class Main extends Application {
 	private void initImg() {
 		
 		matSnap = new Mat();
-		matSnapDiag = new Mat();
+
 	}
 
 	
@@ -189,7 +216,6 @@ public class Main extends Application {
 
 	
 	public static void main(String[] args) {
-		
 		launch(args);
 	}
 

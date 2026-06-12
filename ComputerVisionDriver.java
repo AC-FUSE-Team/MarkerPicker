@@ -16,6 +16,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.io.IOException;
+
+
 public class ComputerVisionDriver {
 	
 	Mat imageOriginal;
@@ -23,10 +29,13 @@ public class ComputerVisionDriver {
 	Mat imageProcessed;
 	Mat imageFinal;
 	Mat ellipses;
+	Mat labColorspace;
 	
 	MarkerTable markerTable;
 	
 	boolean debugMode;
+	int markerSeqNumber = 0;
+	
 	// Default size of color sampling rectangle;
 	// should be even
 	final int DEFAULT_SAMPLING_SIZE = 50;
@@ -41,6 +50,7 @@ public class ComputerVisionDriver {
 		imageProcessed = new Mat();
 		imageFinal = new Mat();
 		ellipses = new Mat();
+		labColorspace = new Mat();
 		markerTable = new MarkerTable(debugMode);
 		
 		input = new Scanner(System.in);
@@ -51,50 +61,140 @@ public class ComputerVisionDriver {
 		input.close();
 	}
 	
-	public void initColors() {
+	public void startNewFile() {
 		
+		String fileName = "C:\\Users\\nakor\\FUSE\\markers.txt";
+		var path = Paths.get(fileName);
+        try {
+            // Truncates existing marker file
+            Files.writeString(path, "", StandardOpenOption.TRUNCATE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+		markerSeqNumber = 0;
 	}
 	
-	// Uses user's input to select and dump selected colors of markers into a file
-	public void selectColors() {
+	
+	
+	public void chooseColor() {
 		
 		FileWriter file;
+		String colorLine = "";
+		
 		//"/home/nataliya/AC-courses/FUSE/app/markers.txt"
 		//"C:\\Users\\nakor\\FUSE\\markers.txt"
 		String fileName = "C:\\Users\\nakor\\FUSE\\markers.txt";
+		
+
+		var path = Paths.get(fileName);
+        try {
+
+        	
+        	int ellipseSeqNumber = 0;
+
+    		do {
+    			System.out.printf("Please select color for %d-th marker or -1 to save the choice: ", markerSeqNumber);
+    			
+    			while(!input.hasNextInt())
+    			{;}
+    			ellipseSeqNumber = input.nextInt();
+    			
+    			if (ellipseSeqNumber != -1) {
+    				
+    				Scalar[] color = markerTable.getColor(ellipseSeqNumber);
+    				colorLine = String.format("%d %d %d   %d %d %d%n",
+    						(int)color[0].val[0], (int)color[0].val[1], (int)color[0].val[2],
+    						(int)color[1].val[0], (int)color[1].val[1], (int)color[1].val[2]);
+    				
+    				String colorDescr = String.format("RGB: (%d, %d, %d) will be saved as (%d, %d, %d)%nLab: %d %d %d%n",
+    						(int)color[0].val[2], (int)color[0].val[1], (int)color[0].val[0],
+    						(int)color[0].val[0], (int)color[0].val[1], (int)color[0].val[2],
+    						(int)color[1].val[0], (int)color[1].val[1], (int)color[1].val[2]);
+    				
+    				System.out.printf(colorDescr);
+    				
+    				
+    				
+    			}
+    			
+    		} while( ellipseSeqNumber != -1 );
+    		
+            Files.writeString(path, colorLine, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+            
+            //file.write( colorLine );
+    		markerSeqNumber++;
+    		
+    		System.out.printf("The marker color saved%n");
+    		//file.close();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+       
+/*
+		
+		
+		
 		try {
 			file = new FileWriter(fileName, false);
-
-		int markerSeqNumber = 0;
+		
+		int ellipseSeqNumber = 0;
 
 		do {
-			System.out.printf("Please select marker number to save its color (100 - to save and finish): ");
+			System.out.printf("Please select color for %d-th marker or -1 to save the choice: ", markerSeqNumber);
 			
 			while(!input.hasNextInt())
 			{;}
-			markerSeqNumber = input.nextInt();
+			ellipseSeqNumber = input.nextInt();
 			
-			if (markerSeqNumber != 100) {
+			if (ellipseSeqNumber != -1) {
 				
-				Scalar[] color = markerTable.getColor(markerSeqNumber);
-				String colorLine = String.format("%d %d %d  %d %d %d  %d %d %d%n",
+				Scalar[] color = markerTable.getColor(ellipseSeqNumber);
+				colorLine = String.format("%d %d %d   %d %d %d%n",
 						(int)color[0].val[0], (int)color[0].val[1], (int)color[0].val[2],
-						(int)color[1].val[0], (int)color[1].val[1], (int)color[1].val[2],
-						(int)color[2].val[0], (int)color[2].val[1], (int)color[2].val[2]);
+						(int)color[1].val[0], (int)color[1].val[1], (int)color[1].val[2]);
 				
-				System.out.printf(colorLine);
-				file.write( colorLine );
+				String colorDescr = String.format("RGB: (%d, %d, %d) will be saved as (%d, %d, %d)%nLab: %d %d %d%n",
+						(int)color[0].val[2], (int)color[0].val[1], (int)color[0].val[0],
+						(int)color[0].val[0], (int)color[0].val[1], (int)color[0].val[2],
+						(int)color[1].val[0], (int)color[1].val[1], (int)color[1].val[2]);
+				
+				System.out.printf(colorDescr);
+				
+				
+				
 			}
 			
-		} while( markerSeqNumber != 100);
+		} while( ellipseSeqNumber != -1 );
 		
-		System.out.printf("Finished%n");
+		file.write( colorLine );
+		markerSeqNumber++;
+		
+		System.out.printf("The marker color saved%n");
 		file.close();
 		
 		}
 		catch(IOException e) {
 			System.out.printf("File Exception:" + e);
 		}
+		*/
+	}
+	
+	
+	
+	public Mat prepareLabImage(Mat inImage) {
+
+		double normKoef = 1;//1./255;
+		Scalar koefScalar = new Scalar(normKoef, normKoef, normKoef);
+
+		Mat tmpImage = inImage.clone();
+
+		Core.multiply(tmpImage, koefScalar, tmpImage);
+		Imgproc.cvtColor(tmpImage, labColorspace, Imgproc.COLOR_BGR2Lab);
+
+		return labColorspace;
+
 	}
 	
 	
@@ -102,20 +202,21 @@ public class ComputerVisionDriver {
 	 *  snapshotIn is an original image,
 	 *  snapshotOut is used to output diagnostic information over an original image;
 	 *  the both objects are created and provided by a caller */
-	public int findSelectedMarker(Mat snapshotIn, Mat snapshotOut) {
+	public void findSelectedMarker(Mat snapshotIn, Mat snapshotOut) {
 		
 		imageOriginal = snapshotIn;
 		imageFinal = snapshotOut;
 		
+		labColorspace = prepareLabImage(imageOriginal);
+		
 		/* Detect Ellipses in the original image */
 		Imgproc.cvtColor(imageOriginal, imageProcessedTmp, Imgproc.COLOR_BGR2GRAY);
 		Imgproc.medianBlur(imageProcessedTmp, imageProcessed, 3);
-		//medianBlur​(imageProcessedTmp, imageProcessed, 3);
-
+		
+		
 		EdgeDrawing ed = Ximgproc.createEdgeDrawing();
 		ed.detectEdges(imageProcessed);
 		ed.detectEllipses(ellipses);
-		//detectEllipses​(ellipses);
 
 		// The first [0] marker (a.k.a "pointer") is a center of the image
 		markerTable.initMarkers(imageOriginal.width() / 2, imageOriginal.height() / 2);
@@ -154,7 +255,7 @@ public class ComputerVisionDriver {
 			
 			
 			// 0. Prepare color sampling rectangle
-			
+
 			int sampleDefaultRectSize = DEFAULT_SAMPLING_SIZE;
 			
 			int sampleRectSize = (ellipseSize1 < ellipseSize2) ? ellipseSize1 : ellipseSize2;
@@ -202,11 +303,14 @@ public class ComputerVisionDriver {
 			// 1. Create sampling rectangle
 			Rect sampleRect = new Rect(sampleRectX, sampleRectY, sampleRectSize, sampleRectSize);
 	
-			// 2. Create a submat of an original snapshot image
-			Mat areaToSample = imageOriginal.submat(sampleRect);
+			// 2. Create a submat of original RGB image and Lab image
+			Mat areaToSampleRBG = imageOriginal.submat(sampleRect);
+			Mat areaToSampleLab = labColorspace.submat(sampleRect);
 	
-			// 3. Calculate the mean color values
-			Scalar meanColor = Core.mean(areaToSample);
+			// 3. Calculate the mean color values for original RGB image and Lab image
+			Scalar meanColorRBG = Core.mean(areaToSampleRBG);
+			Scalar meanColorLab = Core.mean(areaToSampleLab);
+
 
 			// highlight the contour of an ellipse with calculated color
 			Size sizeHalo = size;
@@ -214,7 +318,7 @@ public class ComputerVisionDriver {
 			sizeHalo.width += 10;
 			
 			// add a new marker to a marker table
-			markerTable.addMarker((int)center.x, (int)center.y, meanColor);
+			markerTable.addMarker((int)center.x, (int)center.y, meanColorRBG, meanColorLab);
 			
 			
 			/* Output block */
@@ -225,20 +329,13 @@ public class ComputerVisionDriver {
 			
 			// Draw a Halo around selected ellipse
 			Imgproc.ellipse(imageFinal, center, sizeHalo, ellipses.get(i, 0)[5], 0, 360,
-					meanColor, 8, 1);
+					meanColorRBG, 8, 1);
 
 			// print a seq. number of legit marker at the top-left side off an ellipse center
 			Imgproc.putText(imageFinal, String.format("%d", legitMarkersNumber),
 					new Point(center.x - 15, center.y - 10), Imgproc.FONT_HERSHEY_DUPLEX,
 					0.7, new Scalar (255, 255, 255));
 			
-			/*
-			 * putText​(imageFinal,
-			 
-				String.format("%d", legitMarkersNumber),
-				new Point(center.x - 15, center.y - 10), Imgproc.FONT_HERSHEY_DUPLEX,
-				0.7, new Scalar (255, 255, 255));
-			*/
 			if(debugMode) {
 				
 				// print a seq. number of found ellipse at the bottom-right side off an ellipse center
@@ -269,7 +366,7 @@ public class ComputerVisionDriver {
 			
 			// print out sampled color of an ellipse
 			System.out.printf("\tColor RGB: (%d, %d, %d)%n",
-					(int)meanColor.val[2], (int)meanColor.val[1], (int)meanColor.val[0]);
+					(int)meanColorRBG.val[2], (int)meanColorRBG.val[1], (int)meanColorRBG.val[0]);
 			
 			
 			
@@ -278,10 +375,11 @@ public class ComputerVisionDriver {
 		}
 
 		ellipses.release();
+		labColorspace.release();
+		imageProcessedTmp.release();
+		imageProcessed.release();
 		
-		int selection = markerTable.findSelectedMarker();
-		
-		return selection;
+
 	}
 
 }

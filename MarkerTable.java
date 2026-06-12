@@ -16,7 +16,6 @@ public class MarkerTable {
 	 */
 	Marker[] markers;
 	final int MAX_MARKERS = 21;
-	final int ALLOWANCE = 5;
 	
 	int nextMarker;
 	boolean debugMode;
@@ -48,19 +47,13 @@ public class MarkerTable {
 	}
 	
 	/* Adds a marker to the list */
-	public void addMarker(int inX, int inY, Scalar mainColor) {
+	public void addMarker(int inX, int inY, Scalar colorRGB, Scalar colorLab) {
 
-		Scalar[] colors = new Scalar[3];
+		Scalar[] colors = new Scalar[2];
 		
-		colors[0] = mainColor;
-		colors[1] = new Scalar(mainColor.val[0] - ALLOWANCE,
-								mainColor.val[1] - ALLOWANCE,
-								mainColor.val[2] - ALLOWANCE);
-		
-		colors[2] = new Scalar(mainColor.val[0] + ALLOWANCE,
-								mainColor.val[1] + ALLOWANCE,
-								mainColor.val[2] + ALLOWANCE);
-		
+		colors[0] = colorRGB;
+		colors[1] = colorLab;
+
 		markers[nextMarker].setCenter(new Point(inX, inY));
 		markers[nextMarker].setStatus(1);
 		markers[nextMarker].setColor(colors);
@@ -105,15 +98,12 @@ public class MarkerTable {
 				if(debugMode) {
 					System.out.printf("Distance for ellipse %d: %d / MinDistance %d %d%n",
 						i, distance, minDistanceIndex, minDistance);
-					System.out.printf("Color saved: (%d, %d, %d)%n", (int)(markers[i].getColor()[0].val[2]),
+					System.out.printf("Color RGB: (%d, %d, %d)%n", (int)(markers[i].getColor()[0].val[2]),
 											(int)(markers[i].getColor()[0].val[1]),
 											(int)(markers[i].getColor()[0].val[0]) );
-					System.out.printf("Color left bounadry: (%d, %d, %d)%n", (int)(markers[i].getColor()[1].val[2]),
+					System.out.printf("Color Lab: (%d, %d, %d)%n", (int)(markers[i].getColor()[1].val[0]),
 							(int)(markers[i].getColor()[1].val[1]),
-							(int)(markers[i].getColor()[1].val[0]) );
-					System.out.printf("Color right bounadry: (%d, %d, %d)%n%n", (int)(markers[i].getColor()[2].val[2]),
-							(int)(markers[i].getColor()[2].val[1]),
-							(int)(markers[i].getColor()[2].val[0]) );
+							(int)(markers[i].getColor()[1].val[2]) );
 				}
 			}
 			

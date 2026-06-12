@@ -6,11 +6,10 @@ import org.opencv.core.Point;
 
 public class Marker {
 
-	/* color[0] - main color
-	 * color[1] - left boundary
-	 * color[2] - right boundary
+	/* color[0] - BGR color
+	 * color[1] - Lab color
 	 */
-	Scalar[] color; // size 3
+	Scalar[] color;
 
 	Point center;
 	int distance;
@@ -20,7 +19,7 @@ public class Marker {
 
 	public Marker()
 	{
-		//color = new Scalar[3];
+		//;
 	}
 	
 	public void setCenter(Point inCenter) {
