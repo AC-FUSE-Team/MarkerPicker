@@ -63,11 +63,11 @@ public class ComputerVisionDriver {
 	
 	public void startNewFile() {
 		
-		String fileName = "C:\\Users\\nakor\\FUSE\\markers.txt";
+		String fileName = "markers.txt";//"/home/nataliya/AC-courses/FUSE/app/markers1.txt";
 		var path = Paths.get(fileName);
         try {
             // Truncates existing marker file
-            Files.writeString(path, "", StandardOpenOption.TRUNCATE_EXISTING);
+            Files.writeString(path, "", StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,7 +84,7 @@ public class ComputerVisionDriver {
 		
 		//"/home/nataliya/AC-courses/FUSE/app/markers.txt"
 		//"C:\\Users\\nakor\\FUSE\\markers.txt"
-		String fileName = "C:\\Users\\nakor\\FUSE\\markers.txt";
+		String fileName = "markers.txt";//"/home/nataliya/AC-courses/FUSE/app/markers1.txt";
 		
 
 		var path = Paths.get(fileName);
@@ -94,13 +94,13 @@ public class ComputerVisionDriver {
         	int ellipseSeqNumber = 0;
 
     		do {
-    			System.out.printf("Please select color for %d-th marker or -1 to save the choice: ", markerSeqNumber);
+    			System.out.printf("Please select color for %d-th marker;  -1 to save the choice -2 to cancel: ", markerSeqNumber);
     			
     			while(!input.hasNextInt())
     			{;}
     			ellipseSeqNumber = input.nextInt();
     			
-    			if (ellipseSeqNumber != -1) {
+    			if (ellipseSeqNumber > 0) {
     				
     				Scalar[] color = markerTable.getColor(ellipseSeqNumber);
     				colorLine = String.format("%d %d %d   %d %d %d%n",
@@ -118,67 +118,23 @@ public class ComputerVisionDriver {
     				
     			}
     			
-    		} while( ellipseSeqNumber != -1 );
+    		} while( ellipseSeqNumber > 0);
     		
-            Files.writeString(path, colorLine, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
-            
-            //file.write( colorLine );
-    		markerSeqNumber++;
     		
-    		System.out.printf("The marker color saved%n");
-    		//file.close();
+    		if(ellipseSeqNumber == -1) {
+    		
+    			Files.writeString(path, colorLine, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+    			markerSeqNumber++;
+    			System.out.printf("The marker color saved%n");
+
+    		} // else -2 or 
+    		else
+    			System.out.printf("Cancelled%n");
             
         } catch (IOException e) {
             e.printStackTrace();
         }
        
-/*
-		
-		
-		
-		try {
-			file = new FileWriter(fileName, false);
-		
-		int ellipseSeqNumber = 0;
-
-		do {
-			System.out.printf("Please select color for %d-th marker or -1 to save the choice: ", markerSeqNumber);
-			
-			while(!input.hasNextInt())
-			{;}
-			ellipseSeqNumber = input.nextInt();
-			
-			if (ellipseSeqNumber != -1) {
-				
-				Scalar[] color = markerTable.getColor(ellipseSeqNumber);
-				colorLine = String.format("%d %d %d   %d %d %d%n",
-						(int)color[0].val[0], (int)color[0].val[1], (int)color[0].val[2],
-						(int)color[1].val[0], (int)color[1].val[1], (int)color[1].val[2]);
-				
-				String colorDescr = String.format("RGB: (%d, %d, %d) will be saved as (%d, %d, %d)%nLab: %d %d %d%n",
-						(int)color[0].val[2], (int)color[0].val[1], (int)color[0].val[0],
-						(int)color[0].val[0], (int)color[0].val[1], (int)color[0].val[2],
-						(int)color[1].val[0], (int)color[1].val[1], (int)color[1].val[2]);
-				
-				System.out.printf(colorDescr);
-				
-				
-				
-			}
-			
-		} while( ellipseSeqNumber != -1 );
-		
-		file.write( colorLine );
-		markerSeqNumber++;
-		
-		System.out.printf("The marker color saved%n");
-		file.close();
-		
-		}
-		catch(IOException e) {
-			System.out.printf("File Exception:" + e);
-		}
-		*/
 	}
 	
 	
