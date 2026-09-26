@@ -1,6 +1,6 @@
 # Marker Picker
 
-MarkerPicker is a calibration tool in the Vocabulary Builder Kit. It configures the Vocabulary Builder application (VB app)
+Marker Picker is a calibration tool in the Vocabulary Builder Kit. It configures the Vocabulary Builder application (VB app)
 so it works properly under specific lightning. 
 
 ## UX
