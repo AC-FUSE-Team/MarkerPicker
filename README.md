@@ -30,6 +30,6 @@ To build the application you will need:
 ## Future Developments
 
 - Clean up unused code
-- Implement the color selection via GUI,
-- Adapt the application to deal with various image sizes coming from the camera
+- Implement the color selection via GUI
+- Adapt UI to deal with various image sizes coming from the camera
 
